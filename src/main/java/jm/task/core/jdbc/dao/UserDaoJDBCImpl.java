@@ -12,19 +12,19 @@ public class UserDaoJDBCImpl implements UserDao {
 
     private Connection connection = Util.start();
     private PreparedStatement preparedStatement;
-    private final String DELETE = "DELETE FROM User WHERE id = ?";
-    private final String GETALL = "SELECT * FROM User";
-    private final String TABLE = "CREATE TABLE users " +
-            "(id INT not NULL PRIMARY KEY AUTO_INCREMENT," +
-            "name VARCHAR(50)," +
-            "lastName VARCHAR(50)," +
-            "age INT not NULL)";
+
+
 
     public UserDaoJDBCImpl() {
     }
 
     public void createUsersTable() {
         try (Statement statement = connection.createStatement())  {
+            private final String TABLE = "CREATE TABLE users " +
+                    "(id INT not NULL PRIMARY KEY AUTO_INCREMENT," +
+                    "name VARCHAR(50)," +
+                    "lastName VARCHAR(50)," +
+                    "age INT not NULL)";
             statement.executeUpdate(TABLE);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -52,10 +52,12 @@ public class UserDaoJDBCImpl implements UserDao {
             e.printStackTrace();
         }
 
+
+
     }
 
     public void removeUserById(long id) {
-        try(PreparedStatement preparedStatement = connection.prepareStatement(DELETE)) {
+        try(PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM User WHERE id = ?")) {
             preparedStatement.setLong(1,id);
             System.out.println("Удален пользователь под индексом" + id);
             preparedStatement.executeUpdate();
@@ -66,9 +68,9 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public List<User> getAllUsers() {
         String sql = "SELECT id, name, lastName, age from users";
+        List<User> users = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
-            List<User> users = new ArrayList<>();
             while (resultSet.next()){
                 User user = new User();
                 user.setId(resultSet.getLong("id"));
@@ -77,12 +79,11 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setAge(resultSet.getByte("age"));
                 users.add(user);
             }
-            return users;
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return users;
     }
 
     public void cleanUsersTable() {
